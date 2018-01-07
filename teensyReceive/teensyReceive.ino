@@ -1,8 +1,8 @@
 #include <Wire.h>
 #include <Adafruit_LiquidCrystal.h>
 
-Adafruit_LiquidCrystal lcd(0);
-
+// MOSI, SCK, LATCH
+Adafruit_LiquidCrystal lcd(11, 13, 15);
 
 int led = 5;
 int led2 = 7;
@@ -26,6 +26,7 @@ void setup() {
   lcd.clear();
 }
 
+elapsedMillis timer;
 void loop() {
   delay(1);
   if (Serial.available() > 0) {
@@ -38,6 +39,8 @@ void loop() {
      if (incomingByte == '\n' && returned==true) {
       digitalWrite(led, HIGH);
       receiveSerial(val);
+      lcd.setCursor(0, 0);
+      lcd.print(val);
       break;
      }
      if (incomingByte == '\r') {
@@ -52,11 +55,13 @@ void loop() {
    //digitalWrite(led, LOW);
   }
   lcd.setCursor(0, 1);
-  lcd.print(millis() / 1000);
+  lcd.print(timer/1000);
 }
 
 void receiveSerial(String val) {
-  
+  char c[20];
+  val.toCharArray(c, 20);
+  Wire.write(c);
 }
 
 void receiveBle(int howMany) {

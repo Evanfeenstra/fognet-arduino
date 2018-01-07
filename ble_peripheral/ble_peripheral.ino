@@ -17,7 +17,8 @@
 
 BLEPeripheral blePeripheral = BLEPeripheral(BLE_REQ, BLE_RDY, BLE_RST);
 BLEService ledService = BLEService("00001234-0000-1000-8000-00805f9b34fb");
-BLECharacteristic characteristic = BLECharacteristic("00001234-0000-1000-8000-00805f9b34fb", BLEWriteWithoutResponse, BLE_ATTRIBUTE_MAX_VALUE_LENGTH);
+BLECharacteristic characteristic = BLECharacteristic("00001234-0000-1000-8000-00805f9b34fb", BLEWriteWithoutResponse | BLENotify, BLE_ATTRIBUTE_MAX_VALUE_LENGTH);
+BLEDescriptor descriptor = BLEDescriptor("00001234-0000-1000-8000-00805f9b34fb", "FogNet");
 
 void setup() {
   Wire.begin();
@@ -30,7 +31,7 @@ void setup() {
   //pinMode(LED_PIN, OUTPUT);
 
   // set advertised local name and service UUID
-  blePeripheral.setLocalName("LEDS");
+  blePeripheral.setLocalName("FogNet");
   blePeripheral.setAdvertisedServiceUuid(ledService.uuid());
 
   // add service and characteristic
@@ -40,7 +41,7 @@ void setup() {
   // assign event handlers for connected, disconnected to peripheral
   blePeripheral.setEventHandler(BLEConnected, blePeripheralConnectHandler);
   blePeripheral.setEventHandler(BLEDisconnected, blePeripheralDisconnectHandler);
-
+  
   // assign event handlers for characteristic
   characteristic.setEventHandler(BLEWritten, characteristicWritten);
 
@@ -61,9 +62,11 @@ void loop() {
     Wire.write("x is ");
     Wire.write(idx);
     Wire.endTransmission();
+    characteristic.setValue("HITEST");
     idx++;
     timeElapsed = 0;
   }
+  pollWire();
 }
 
 void blePeripheralConnectHandler(BLECentral& central) {
@@ -71,7 +74,7 @@ void blePeripheralConnectHandler(BLECentral& central) {
   Serial.print(F("Connected event, central: "));
   Serial.println(central.address());
   Wire.beginTransmission(8);
-  Wire.write("connected");
+  Wire.write("<*>connected<^>");
   Wire.endTransmission();
 }
 
@@ -92,4 +95,16 @@ void characteristicWritten(BLECentral& central, BLECharacteristic& characteristi
   Wire.write(msg);
   Wire.endTransmission();
   //led = characteristic.value();
+}
+
+void pollWire() {
+  //Wire.requestFrom(8,20);
+  char* x;
+  while (0 < Wire.available()) { 
+    char c = Wire.read();
+    x += c;
+  }
+  if(strlen(x)>0){
+    characteristic.setValue(x);
+  } 
 }
