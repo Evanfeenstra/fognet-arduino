@@ -92,7 +92,7 @@ void receiveBle(int howMany) { // also runs on requestfrom???
   if(Wire.available()==1){
     char x = Wire.read();
     buff += x;
-    if(buff!=wireBuff){      
+    if(buff!=wireBuff){
       ins++;
       Serial.println(buff);
       wireBuff=buff;
