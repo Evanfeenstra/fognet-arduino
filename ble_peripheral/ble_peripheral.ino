@@ -27,9 +27,6 @@ void setup() {
   delay(5000);  //5 seconds delay for enabling to see the start up comments on the serial board
 #endif
 
-  // set LED pin to output mode
-  //pinMode(LED_PIN, OUTPUT);
-
   // set advertised local name and service UUID
   blePeripheral.setLocalName("FogNet");
   blePeripheral.setAdvertisedServiceUuid(ledService.uuid());
@@ -38,8 +35,8 @@ void setup() {
   blePeripheral.addAttribute(notifyChar);
 
   // assign event handlers for connected, disconnected to peripheral
-  //blePeripheral.setEventHandler(BLEConnected, blePeripheralConnectHandler);
-  //blePeripheral.setEventHandler(BLEDisconnected, blePeripheralDisconnectHandler);
+  blePeripheral.setEventHandler(BLEConnected, blePeripheralConnectHandler);
+  blePeripheral.setEventHandler(BLEDisconnected, blePeripheralDisconnectHandler);
   
   // assign event handlers for characteristic
   characteristic.setEventHandler(BLEWritten, characteristicWritten);
@@ -55,12 +52,8 @@ int idx = 0;
 
 void loop() {
   blePeripheral.poll();
-  delay(1);
-  if(timeElapsed>5000){
-    //pollWire();
-    pollWire2();
-    timeElapsed = 0;
-  }
+  delay(1u);
+  pollWire();
 }
 
 void blePeripheralConnectHandler(BLECentral& central) {
@@ -87,34 +80,7 @@ void characteristicWritten(BLECentral& central, BLECharacteristic& characteristi
   Wire.endTransmission();
 }
 
-char* receiveBuffer;
 void pollWire() {
-  char* buff;
-  //int n = 0;
-  int n = Wire.requestFrom(8,20); // THIS IS SPAMMING
-  if(n==20) {
-    Wire.readBytes(buff, n);
-    if(buff!=receiveBuffer){
-      notifyChar.setValue(buff);
-      receiveBuffer = buff;
-    }
-  }
-  /*while(Wire.read()) {
-    num = Wire.receive();
-  }*/
-  //char* x = Wire.read();
-  //notifyChar.setValue(x);
-  /*char* x;
-  while (Wire.available() > 0) { 
-    char c = Wire.read();
-    x += c;
-    if(x[0]!=0 && x[1]!=0 && x[2]!=0){
-      notifyChar.setValue(x);
-    }
-  }*/
-}
-
-void pollWire2() {
   int n = Wire.requestFrom(8,20);
   String buff = "";
   //int n=0;
@@ -123,22 +89,9 @@ void pollWire2() {
     buff += c;
   }
   if(buff!=""){
-    //buff[19]='\0';
-    //char a[20];
-    //sprintf(a,buff);
-    //char msg[20];
-    //sprintf(buff, "%20c", NULL);
     char msg[20];
     buff.toCharArray(msg, 20);
     notifyChar.setValue((unsigned char*)msg,20);
-    //notifyChar.setValue(buff);
-  } 
-  /*if(n==20) {
-    Wire.readBytes(buff, n);
-    if(strcmp(buff, receiveBuffer) != 0){
-      notifyChar.setValue(buff);
-      receiveBuffer = buff;
-    }
-  }*/
+  }
 }
 
