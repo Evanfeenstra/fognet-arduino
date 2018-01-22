@@ -1,0 +1,4 @@
+### ble_peripheral
+Runs a Bluetooth Low Energy peripheral device, for passing data to the Fognet browser at [fognet.me](fognet.me). Uses the Nordic [nRF52842](https://www.nordicsemi.com/eng/Products/Bluetooth-low-energy/nRF52832), the [Ble Nano v2](https://redbear.cc/product/ble-nano-kit-2.html), and [this library](https://github.com/sandeepmistry/arduino-BLEPeripheral).
+### teensyReceive
+Arduino ([Teensy LC](https://www.pjrc.com/teensy/teensyLC.html)) code for interfacing the **ble_peripheral** (via I2C), and the node.js [Fognet server](https://github.com/Evanfeenstra/fognet-server) (via serial). Also runs an LCD screen to monitor traffic.
