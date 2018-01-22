@@ -7,6 +7,7 @@ Adafruit_LiquidCrystal lcd(11, 13, 15);
 int led = 5;
 int led2 = 7;
 int led3 = 9;
+String printUrl = "";
 
 void setup() {
   pinMode(led, OUTPUT);
@@ -22,7 +23,7 @@ void setup() {
   Serial.println("teensy started");
   lcd.begin(16, 2);
   lcd.setCursor(0, 0);
-  lcd.print("ho");
+  lcd.print("init");
   delay(1000);
   lcd.clear();
 }
@@ -33,12 +34,12 @@ int outs = 0;
 String incomingSerial;
 void loop() {
   delay(1);
+  lcd.setCursor(0, 0);
+  lcd.print(printUrl);
   lcd.setCursor(0, 1);
-  lcd.print(ins);
-  //lcd.setCursor(0, 0);
-  //lcd.print(val);
-  lcd.setCursor(8, 1);
-  lcd.print(outs);
+  lcd.print("In:"+String(ins));
+  lcd.setCursor(7, 1);
+  lcd.print("Out:"+String(outs));
   if (incomingSerial == ""){
     checkForSerial();
   }
@@ -96,6 +97,9 @@ void receiveBle(int howMany) { // also runs on requestfrom???
       ins++;
       Serial.println(buff);
       wireBuff=buff;
+      if(wireBuff.substring(0,4)=="http"){
+        printUrl=wireBuff;
+      }
       //Wire.flush();
     }
   }
