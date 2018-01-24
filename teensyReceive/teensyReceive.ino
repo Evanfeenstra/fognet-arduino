@@ -100,6 +100,9 @@ void receiveBle(int howMany) { // also runs on requestfrom???
       if(wireBuff.substring(0,4)=="http"){
         printUrl=wireBuff;
       }
+      if(wireBuff.substring(0,12)=="<*>connected"){
+        printUrl="Connected!";
+      }
       //Wire.flush();
     }
   }
